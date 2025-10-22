@@ -23,6 +23,10 @@ namespace LibraryWeb
 
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<IBookRepository, BookRepository>();
+            builder.Services.AddScoped<ILoanRepository, LoanRepository>();
+            builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+            builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+
 
             var app = builder.Build();
 

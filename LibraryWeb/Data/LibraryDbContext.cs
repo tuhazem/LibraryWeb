@@ -1,11 +1,12 @@
-﻿using LibraryWeb.Models;
+﻿
+using LibraryWeb.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryWeb.Data
 {
     public class LibraryDbContext : DbContext
     {
-        private readonly DbContextOptions<LibraryDbContext> dbContext;
+        private readonly DbContextOptions<LibraryDbContext> dbContextOptions;
 
         public LibraryDbContext(DbContextOptions<LibraryDbContext> _dbContext) : base(_dbContext)
         {  
