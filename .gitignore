@@ -361,3 +361,23 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+
+
+# ===== Custom ignore for sensitive files =====
+# Ignore local database files
+*.db
+*.sqlite
+*.mdf
+*.ldf
+*.bak
+
+# Ignore user secrets and environment config
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+secrets.json
+
+# Ignore logs and cache
+*.log
+logs/
