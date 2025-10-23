@@ -2,6 +2,7 @@
 using LibraryWeb.DTO;
 using LibraryWeb.Models;
 using LibraryWeb.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,7 @@ namespace LibraryWeb.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetAllBooks()
         {
             var books = bookrepo.GetAll().Select(b => new BookDTO

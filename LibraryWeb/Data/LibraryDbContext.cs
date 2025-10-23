@@ -1,10 +1,11 @@
 ﻿
 using LibraryWeb.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryWeb.Data
 {
-    public class LibraryDbContext : DbContext
+    public class LibraryDbContext : IdentityDbContext<ApplicationUser>
     {
         private readonly DbContextOptions<LibraryDbContext> dbContextOptions;
 
@@ -18,6 +19,7 @@ namespace LibraryWeb.Data
         public DbSet<BookAuthor> BookAuthors { get; set; }
         public DbSet<Loan> Loans { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -61,6 +63,8 @@ namespace LibraryWeb.Data
                 .HasForeignKey(l => l.MemberId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
+
 
 
     }
