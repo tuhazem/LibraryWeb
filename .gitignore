@@ -381,3 +381,4 @@ Properties/launchSettings.json
 # Ignore logs and cache
 *.log
 logs/
+/LibraryWeb/Properties/launchSettings.json

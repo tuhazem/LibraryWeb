@@ -2,6 +2,7 @@
 using LibraryWeb.Models;
 using LibraryWeb.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace LibraryWeb.Repository.Implementation
 {
@@ -40,6 +41,11 @@ namespace LibraryWeb.Repository.Implementation
             return dblibrary.Books.Include(c=>c.Category)
                 .Include(a=> a.BookAuthors).ThenInclude(a=>a.Author)
                 .FirstOrDefault(b => b.Id == id);
+        }
+
+        public async Task<Book?> GetByIsbn(string isbn)
+        {
+            return await dblibrary.Books.FirstOrDefaultAsync(b => b.ISBN.ToLower() == isbn.ToLower());
         }
 
         public void Save()

@@ -1,6 +1,7 @@
 ﻿using LibraryWeb.Data;
 using LibraryWeb.Models;
 using LibraryWeb.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryWeb.Repository.Implementation
 {
@@ -25,6 +26,11 @@ namespace LibraryWeb.Repository.Implementation
             {
                 dbcontext.Authors.Remove(author);
             }
+        }
+
+        public async Task<Author?> FindByName(string name)
+        {
+            return await dbcontext.Authors.FirstOrDefaultAsync(a => a.FullName.ToLower() == name.ToLower());
         }
 
         public IEnumerable<Author> GetAll()

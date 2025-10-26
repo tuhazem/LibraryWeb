@@ -3,6 +3,7 @@ using LibraryWeb.Models;
 using LibraryWeb.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace LibraryWeb.Controllers
 {
@@ -47,8 +48,15 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateAuthor(CreateAuthorDTO dto)
+        public async Task<IActionResult> CreateAuthor(CreateAuthorDTO dto)
         {
+
+            var existingAuthor = authorRepository.FindByName(dto.FullName);
+            if (existingAuthor != null)
+            {
+                return BadRequest("Author with the same name already exists.");
+            }
+
             var author = new Author
             {
                 FullName = dto.FullName,

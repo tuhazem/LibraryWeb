@@ -7,6 +7,7 @@ namespace LibraryWeb.Repository.Interface
 
         IEnumerable<Book> GetAll();
         Book? GetById(int id);
+        Task<Book?> GetByIsbn(string isbn);
         void Add(Book book);
         void Update(Book book);
         void Delete(int id);

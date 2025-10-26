@@ -66,6 +66,13 @@ namespace LibraryWeb.Controllers
         [HttpPost]
         public IActionResult CreateBook([FromBody] CreateBookDTO createBook)
         {
+
+            var exists = bookrepo.GetByIsbn(createBook.ISBN);
+            if (exists == null)
+            {
+                return BadRequest("This ISBN IS Already Exists");
+            }
+
             var category = catrepo.GetById(createBook.CategoryId);
             if (category == null)
             {
