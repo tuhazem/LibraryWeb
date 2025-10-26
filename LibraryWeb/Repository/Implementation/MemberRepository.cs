@@ -1,6 +1,7 @@
 ﻿using LibraryWeb.Data;
 using LibraryWeb.Models;
 using LibraryWeb.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryWeb.Repository.Implementation
 {
@@ -32,9 +33,9 @@ namespace LibraryWeb.Repository.Implementation
             return dbcontext.Members.ToList();
         }
 
-        public Member? GetByEmail(string email)
+        public async Task<Member?> GetByEmail(string email)
         {
-            return dbcontext.Members.FirstOrDefault(m => m.Email == email);
+            return await dbcontext.Members.FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public Member? GetById(int id)

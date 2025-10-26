@@ -1,6 +1,7 @@
 ﻿using LibraryWeb.DTO;
 using LibraryWeb.Models;
 using LibraryWeb.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Member,Admin")]
         public IActionResult GetAllAuthors()
         {
             var authors = authorRepository.GetAll();
@@ -31,6 +33,7 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Member,Admin")]
         public IActionResult GetById(int id) { 
         
             var author = authorRepository.GetById(id);
@@ -48,6 +51,7 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateAuthor(CreateAuthorDTO dto)
         {
 
@@ -67,6 +71,7 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAuthor(int id, UpdateAuthorDTO dto)
         {
             var author = authorRepository.GetById(id);
@@ -87,6 +92,7 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteAuthor(int id)
         {
             var author = authorRepository.GetById(id);

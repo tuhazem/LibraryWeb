@@ -30,7 +30,7 @@ namespace LibraryWeb.Repository.Implementation
 
         public async Task<Author?> FindByName(string name)
         {
-            return await dbcontext.Authors.FirstOrDefaultAsync(a => a.FullName.ToLower() == name.ToLower());
+            return await dbcontext.Authors.FirstOrDefaultAsync(a => a.FullName.Trim().ToLower() == name.Trim().ToLower());
         }
 
         public IEnumerable<Author> GetAll()

@@ -40,7 +40,7 @@ namespace LibraryWeb.Repository.Implementation
                 .FirstOrDefault(l=> l.Id == id);
         }
 
-        public IEnumerable<Loan> GetByMember(int memberId)
+        public IEnumerable<Loan> GetByMember(string memberId)
         {
             return dbcontext.Loans
                 .Include(l => l.Book)
@@ -50,10 +50,13 @@ namespace LibraryWeb.Repository.Implementation
                 .ToList();
         }
 
-        public bool HasActiveLoan(int bookId, int memberId)
+
+        public bool HasActiveLoan(int bookId, string memberId)
         {
-            return dbcontext.Loans.Any(l => l.BookId == bookId && l.MemberId == memberId && !l.IsReturned);
+            return dbcontext.Loans
+                .Any(l => l.BookId == bookId && l.MemberId == memberId && !l.IsReturned);
         }
+
 
         public void Save()
         {

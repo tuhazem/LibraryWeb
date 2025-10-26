@@ -6,7 +6,8 @@ namespace LibraryWeb.Repository.Interface
     {
         IEnumerable<Member> GetAll();
         Member? GetById(int id);
-        Member? GetByEmail(string email);
+        Task<Member?> GetByEmail(string email);
+
         void Add(Member member);
         void Update(Member member);
         void Delete(int id);

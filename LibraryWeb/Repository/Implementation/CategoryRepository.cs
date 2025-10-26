@@ -1,6 +1,8 @@
 ﻿using LibraryWeb.Data;
 using LibraryWeb.Models;
 using LibraryWeb.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace LibraryWeb.Repository.Implementation
 {
@@ -37,6 +39,11 @@ namespace LibraryWeb.Repository.Implementation
         {
             Category? category = dbContext.Categories.FirstOrDefault(c => c.Id == id);
             return category;
+        }
+
+        public async Task<Category?> GetByName(string name)
+        {
+            return await dbContext.Categories.FirstOrDefaultAsync(c => c.Name.Trim().ToLower() == name.Trim().ToLower());
         }
 
         public void Save()

@@ -1,8 +1,11 @@
 ﻿using LibraryWeb.DTO;
 using LibraryWeb.Models;
+using LibraryWeb.Repository.Implementation;
 using LibraryWeb.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace LibraryWeb.Controllers
 {
@@ -18,6 +21,7 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Member,Admin")]
         public IActionResult GetAllCategories()
         {
             var categories = dbcategory.GetAll().Select(c => new CategoryDTO
@@ -29,6 +33,7 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Member,Admin")]
         public IActionResult GetCategoryById(int id)
         {
             var category = dbcategory.GetById(id);
@@ -46,8 +51,14 @@ namespace LibraryWeb.Controllers
 
 
         [HttpPost]
-        public IActionResult CreateCategory([FromBody] CreateCategoryDTO createCategory) {
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDTO createCategory) {
 
+            
+            var exist = await dbcategory.GetByName(createCategory.Name);
+            if (exist != null) {
+                return BadRequest("Category Name is already Exist");
+            }
 
             var category = new Category();
             category.Name = createCategory.Name;
@@ -57,6 +68,7 @@ namespace LibraryWeb.Controllers
             {
                 Id = category.Id,
                 Name = category.Name
+                
             };
             return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, categoryDTO);
 
@@ -64,13 +76,20 @@ namespace LibraryWeb.Controllers
 
 
         [HttpPut("{id:int}")]
-        public IActionResult Update(int id, [FromBody] CreateCategoryDTO dto) {
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(int id, [FromBody] CreateCategoryDTO dto) {
 
             var category = dbcategory.GetById(id);
             if (category == null)
             {
                 return BadRequest();
             }
+
+            var exist = await dbcategory.GetByName(dto.Name);
+            if (exist != null && exist.Id != id) {
+                return BadRequest("Category Name is already Exist");
+            }
+
             category.Name = dto.Name;
             dbcategory.Update(category);
             dbcategory.Save();
@@ -82,6 +101,7 @@ namespace LibraryWeb.Controllers
 
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id) {
 
             var category = dbcategory.GetById(id);

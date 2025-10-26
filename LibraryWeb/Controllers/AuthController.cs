@@ -28,6 +28,7 @@ namespace LibraryWeb.Controllers
             try
             {
                 var result = await authService.RegisterAsync(registerDTO);
+               
                 return Ok(result);
             }
             catch (InvalidOperationException ex)

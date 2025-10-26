@@ -15,16 +15,18 @@ namespace LibraryWeb.Controllers
     {
         private readonly IBookRepository bookrepo;
         private readonly ICategoryRepository catrepo;
+        private readonly IAuthorRepository author;
 
-        public BookController(IBookRepository _repo, ICategoryRepository categoryRepository)
+        public BookController(IBookRepository _repo, ICategoryRepository categoryRepository , IAuthorRepository author)
         {
             bookrepo = _repo;
             this.catrepo = categoryRepository;
+            this.author = author;
         }
 
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Member,Admin")]
         public IActionResult GetAllBooks()
         {
             var books = bookrepo.GetAll().Select(b => new BookDTO
@@ -43,6 +45,8 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Member,Admin")]
+
         public IActionResult GetBookById(int id)
         {
             var book = bookrepo.GetById(id);
@@ -65,6 +69,7 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBook([FromBody] CreateBookDTO createBook)
         {
 
@@ -74,11 +79,31 @@ namespace LibraryWeb.Controllers
                 return BadRequest("This ISBN IS Already Exists");
             }
 
+            if (createBook.AuthorIds == null || !createBook.AuthorIds.Any())
+            {
+                return BadRequest("You must provide at least one author ID.");
+            }
+
             var category = catrepo.GetById(createBook.CategoryId);
             if (category == null)
             {
                 return BadRequest("Invalid CategoryId");
             }
+
+            var authors =  createBook.AuthorIds
+                .Select(id => author.GetById(id))
+                .ToList();
+
+            if (authors.Any(a => a == null))
+            {
+                return BadRequest("One or more authors not found.");
+            }
+
+            
+
+
+
+
             var book = new Book
             {
                 ISBN = createBook.ISBN,
@@ -94,11 +119,28 @@ namespace LibraryWeb.Controllers
             };
             bookrepo.Add(book);
             bookrepo.Save();
-            return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
+
+
+
+            var bookDTO = new BookDTO
+            {
+                Id = book.Id,
+                ISBN = book.ISBN,
+                Title = book.Title,
+                Description = book.Description,
+                CopiesAvailable = book.CopiesAvailable,
+                TotalCopies = book.TotalCopies,
+                CategoryName = category.Name,
+                AuthorNames = authors.Select(a => a.FullName).ToList()
+            };
+
+            return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, bookDTO);
         }
 
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Update(int id, CreateBookDTO dto) {
 
 
@@ -125,11 +167,25 @@ namespace LibraryWeb.Controllers
             }).ToList();
             bookrepo.Update(book);
             bookrepo.Save();
+
+            var category = catrepo.GetById(book.CategoryId);
+            var bookDTO = new BookDTO
+            {
+                Id = book.Id,
+                ISBN = book.ISBN,
+                Title = book.Title,
+                Description = book.Description,
+                CopiesAvailable = book.CopiesAvailable,
+                TotalCopies = book.TotalCopies,
+                CategoryName = category?.Name ?? "",
+                AuthorNames = book.BookAuthors.Select(ba => ba.Author.FullName).ToList()
+            };
             return NoContent();
 
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id) {
 
             var book = bookrepo.GetById(id);

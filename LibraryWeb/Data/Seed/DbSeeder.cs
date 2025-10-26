@@ -25,7 +25,8 @@ namespace LibraryWeb.Data.Seed
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
-                    FullName = "System Admin"
+                    FullName = "System Admin",
+                    EmailConfirmed = true,
                 };
 
                 var result = await userManager.CreateAsync(user, "Admin@123");
