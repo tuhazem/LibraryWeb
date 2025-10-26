@@ -5,6 +5,7 @@ using LibraryWeb.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace LibraryWeb.Controllers
 {
@@ -64,11 +65,11 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateBook([FromBody] CreateBookDTO createBook)
+        public async Task<IActionResult> CreateBook([FromBody] CreateBookDTO createBook)
         {
 
-            var exists = bookrepo.GetByIsbn(createBook.ISBN);
-            if (exists == null)
+            var exists = await bookrepo.GetByIsbn(createBook.ISBN);
+            if (exists != null)
             {
                 return BadRequest("This ISBN IS Already Exists");
             }
@@ -98,13 +99,19 @@ namespace LibraryWeb.Controllers
 
 
         [HttpPut("{id:int}")]
-        public IActionResult Update(int id, CreateBookDTO dto) {
+        public async Task<IActionResult> Update(int id, CreateBookDTO dto) {
 
 
             var book = bookrepo.GetById(id);
             if (book == null) { 
                 return NotFound();
             }
+
+            var exists = await bookrepo.GetByIsbn(dto.ISBN);
+            if (exists != null && exists.Id != id) {
+                return BadRequest("A book with the same ISBN already exists.");
+            }
+
             book.ISBN = dto.ISBN;
             book.Title = dto.Title;
             book.TotalCopies = dto.TotalCopies;

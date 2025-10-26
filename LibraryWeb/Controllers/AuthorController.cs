@@ -51,7 +51,7 @@ namespace LibraryWeb.Controllers
         public async Task<IActionResult> CreateAuthor(CreateAuthorDTO dto)
         {
 
-            var existingAuthor = authorRepository.FindByName(dto.FullName);
+            var existingAuthor = await authorRepository.FindByName(dto.FullName);
             if (existingAuthor != null)
             {
                 return BadRequest("Author with the same name already exists.");
@@ -67,13 +67,19 @@ namespace LibraryWeb.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult UpdateAuthor(int id, UpdateAuthorDTO dto)
+        public async Task<IActionResult> UpdateAuthor(int id, UpdateAuthorDTO dto)
         {
             var author = authorRepository.GetById(id);
             if (author == null)
             {
                 return NotFound("Author not found.");
             }
+
+            var exist = await authorRepository.FindByName(dto.FullName);
+            if (exist != null && exist.Id != id) {
+                return BadRequest("Author with the same name already exists.");
+            }
+
             author.FullName = dto.FullName;
             authorRepository.Update(author);
             authorRepository.Save();
