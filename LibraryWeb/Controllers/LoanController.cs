@@ -31,8 +31,6 @@ namespace LibraryWeb.Controllers
             var loans = loanRepo.GetAll().Select(l => new LoanDTO
             {
                 Id = l.Id,
-                MemberFullName = l.Member.FullName,
-                MemberEmail = l.Member.Email,
                 BookTitle = l.Book.Title,
                 LoanDate = l.LoanDate,
                 ReturnDate = l.ReturnDate
@@ -40,6 +38,31 @@ namespace LibraryWeb.Controllers
 
             return Ok(loans);
         }
+
+        [HttpGet("My")]
+        [Authorize(Roles = "Admin,Member")]
+        public async Task<IActionResult> MyLoans() {
+
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) {
+
+                return Unauthorized();
+            }
+
+            var loans = loanRepo.GetByMember(user.Id)
+                .Select(l => new LoanDTO
+                { 
+                
+                    Id = l.Id,
+                    BookTitle= l.Book.Title,
+                    LoanDate= l.LoanDate,
+                    ReturnDate = l.ReturnDate
+
+                });
+
+               return Ok(loans);              
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "Member,Admin")]
@@ -58,6 +81,9 @@ namespace LibraryWeb.Controllers
             if (book.CopiesAvailable <= 0)
                 return BadRequest("No copies available for this book");
 
+            if (loanRepo.HasActiveLoan(dto.BookId, member.Id))
+                return BadRequest("You already borrowed this book and haven't returned it yet.");
+
             book.CopiesAvailable -= 1;
             bookRepo.Update(book);
             bookRepo.Save();
@@ -67,7 +93,8 @@ namespace LibraryWeb.Controllers
             {
                 MemberId = member.Id,
                 BookId = dto.BookId,
-                LoanDate = System.DateTime.Now
+                LoanDate = System.DateTime.Now,
+                DueDate = System.DateTime.Now.AddDays(14)
             };
 
             loanRepo.Add(loan);
@@ -84,6 +111,26 @@ namespace LibraryWeb.Controllers
             };
 
             return Ok(loanDTO);
+        }
+
+
+        [HttpGet("overdue")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GetOverdueLoans()
+        {
+            var overdueLoans = loanRepo.GetAll()
+                .Where(l => !l.IsReturned && l.DueDate < DateTime.Now)
+                .Select(l => new LoanDTO
+                {
+                    Id = l.Id,
+                    MemberFullName = l.Member.FullName,
+                    MemberEmail = l.Member.Email,
+                    BookTitle = l.Book.Title,
+                    LoanDate = l.LoanDate,
+                    DueDate = l.DueDate
+                }).ToList();
+
+            return Ok(overdueLoans);
         }
 
 
